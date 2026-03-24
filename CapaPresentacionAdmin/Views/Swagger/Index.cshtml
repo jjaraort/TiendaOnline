@@ -1,0 +1,29 @@
+@{
+    ViewBag.Title = "API Documentation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2>API Documentation</h2>
+    <div id="swagger-ui"></div>
+</div>
+
+@section scripts{
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui-standalone-preset.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4/swagger-ui.css" />
+
+    <script>
+        window.onload = function () {
+            const ui = SwaggerUIBundle({
+                url: '@Url.Action("Docs", "Swagger")',
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+}

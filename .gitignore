@@ -1,0 +1,63 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# NuGet
+packages/
+*.nupkg
+
+# Web
+node_modules/
+bower_components/
+
+# Logs
+*.log
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# JetBrains Rider
+.idea/
+
+# Others
+*.db
+*.cache
+
+# Sensitive files (do not commit credentials)
+appsettings*.json
+*.env
+**/Web.Debug.config
+**/Web.Release.config
+
+# Visual Studio Code
+.vscode/
+
+# IIS
+IISExpress/*
+
+# VSIX
+*.vsix
+
+# Temporary
+*~
+
+# SQL Server files
+*.mdf
+*.ldf
+
+# Ignore publish folder
+**/publish/
+
+# Ignore user-specific files
+*.userprefs
+
+# Ignore upgrade logs
+UpgradeLog*.htm
