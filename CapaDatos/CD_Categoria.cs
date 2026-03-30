@@ -19,12 +19,7 @@ namespace CapaDatos
             {
                 using (SqlConnection conexion = new SqlConnection(Conexion.cn))
                 {
-                    string query = @"SELECT 
-                                IdCategoria,
-                                Descripcion,
-                                Activo,
-                                FechaRegistro
-                             FROM CATEGORIA";
+                    string query = @"SELECT IdCategoria, Descripcion, Activo, FechaRegistro FROM CATEGORIA";
 
                     using (SqlCommand cmd = new SqlCommand(query, conexion))
                     {
