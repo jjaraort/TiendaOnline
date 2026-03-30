@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using System.Net.Mail;
 using System.Net;
 using System.IO;
-using System.Configuration;
-using System.Diagnostics;
 
 namespace CapaNegocio
 {
@@ -46,43 +44,23 @@ namespace CapaNegocio
 
             try
             {
-                string smtpHost = ConfigurationManager.AppSettings["SmtpHost"] ?? "smtp.gmail.com";
-                int smtpPort = int.TryParse(ConfigurationManager.AppSettings["SmtpPort"], out var p) ? p : 587;
-                bool enableSsl = bool.TryParse(ConfigurationManager.AppSettings["SmtpEnableSsl"], out var s) ? s : true;
-                string smtpUser = ConfigurationManager.AppSettings["SmtpUser"];
-                string smtpPass = ConfigurationManager.AppSettings["SmtpPass"];
-                string fromAddress = ConfigurationManager.AppSettings["SmtpFrom"] ?? smtpUser;
-                string fromDisplay = ConfigurationManager.AppSettings["SmtpFromDisplay"] ?? "Tienda Online";
+                MailMessage mail = new MailMessage();
+                mail.To.Add(correo);
+                mail.From = new MailAddress("jeort420@gmail.com");
+                mail.Subject = asunto;
+                mail.Body = mensaje;
+                mail.IsBodyHtml = true;
 
-                if (string.IsNullOrWhiteSpace(smtpUser) || string.IsNullOrWhiteSpace(smtpPass) || string.IsNullOrWhiteSpace(fromAddress))
-                {
-                    Trace.WriteLine("EnviarCorreo: configuración SMTP incompleta. Configure SmtpUser/SmtpPass/SmtpFrom en Web.config.");
-                    return false;
-                }
-
-                using (var mail = new MailMessage())
-                {
-                    mail.To.Add(correo);
-                    mail.From = new MailAddress(fromAddress, fromDisplay);
-                    mail.Subject = asunto;
-                    mail.Body = mensaje;
-                    mail.IsBodyHtml = true;
-
-                    using (var smtp = new SmtpClient(smtpHost, smtpPort))
-                    {
-                        smtp.Credentials = new NetworkCredential(smtpUser, smtpPass);
-                        smtp.EnableSsl = enableSsl;
-                        smtp.UseDefaultCredentials = false;
-                        smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                        smtp.Timeout = 20000;
-
-                        smtp.Send(mail);
-                        resultado = true;
-                    }
-                }
+                var smtp = new SmtpClient() { 
+                    Credentials = new NetworkCredential("jeort420@gmail.com", "strr rsnt pfmo cmsq"),
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                };
+                smtp.Send(mail);
+                resultado = true;
             }
             catch (Exception ex) {
-                Trace.WriteLine("Error EnviarCorreo: " + ex.ToString());
                 resultado = false;
             }
             return (resultado);
