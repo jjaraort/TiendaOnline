@@ -104,5 +104,84 @@ namespace CapaPresentacionAdmin.Controllers
 
             return Json(new { resultado = respuesta, mensaje = mensaje });
         }
+        #region Categoria
+        [HttpGet]
+        public JsonResult ListarMarca()
+        {
+            try
+            {
+                List<Marca> oLista = new CD_Marca().Listar();
+                return Json(new { data = oLista }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { data = new List<Marca>(), mensaje = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpPost]
+        public JsonResult GuardarMarca(Marca objeto)
+        {
+            int resultado = 0;
+            string mensaje = "";
+
+            try
+            {
+                // VALIDACIONES
+                if (objeto == null)
+                {
+                    return Json(new { resultado = 0, mensaje = "Datos inválidos" });
+                }
+
+                if (string.IsNullOrWhiteSpace(objeto.Descripcion))
+                {
+                    return Json(new { resultado = 0, mensaje = "La descripción de la marca es obligatoria" });
+                }
+
+                if (objeto.IdMarca == 0)
+                {
+                    // NUEVO
+                    resultado = new CD_Marca().Registrar(objeto, out mensaje);
+                }
+                else
+                {
+                    // EDITAR
+                    bool respuesta = new CD_Marca().Editar(objeto, out mensaje);
+                    resultado = respuesta ? 1 : 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.ToString();
+                resultado = 0;
+            }
+
+            return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult EliminarMarca(int id)
+        {
+            bool respuesta = false;
+            string mensaje = "";
+
+            try
+            {
+                if (id <= 0)
+                {
+                    return Json(new { resultado = false, mensaje = "Id inválido" });
+                }
+
+                respuesta = new CD_Marca().Eliminar(id, out mensaje);
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.ToString();
+                respuesta = false;
+            }
+
+            return Json(new { resultado = respuesta, mensaje = mensaje });
+        }
+        #endregion
     }
 }
