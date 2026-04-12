@@ -1,8 +1,339 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Producto";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Producto</h2>
+<h1 class="mt-4">Productos</h1>
 
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-boxes me-1"></i> Lista de Productos
+    </div>
+
+    <div class="card-body">
+        <button class="btn btn-success mb-3" onclick="abrirModal(null)">
+            Crear Nuevo Producto
+        </button>
+
+        <table id="tabla" class="display cell-border" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Activo</th>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="FormModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title">Producto</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="contenedor" class="row">
+
+                    <input type="hidden" id="txtid" value="0" />
+
+                    <div class="col-sm-3">
+                        <img id="img_producto" class="img-fluid border rounded mb-2" />
+                        <input type="file" id="fileProducto" class="form-control"
+                               accept="image/png, image/jpeg"
+                               onchange="mostrarImagen(this)" />
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label>Nombre</label>
+                        <input id="txtnombre" class="form-control" />
+
+                        <label class="mt-2">Descripción</label>
+                        <textarea id="txtdescripcion" class="form-control"></textarea>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label>Marca</label>
+                        <select id="cbomarca" class="form-select"></select>
+
+                        <label class="mt-2">Categoría</label>
+                        <select id="cbocategoria" class="form-select"></select>
+
+                        <label class="mt-2">Precio</label>
+                        <input id="txtprecio" class="form-control" />
+                    </div>
+
+                    <div class="col-sm-3">
+                        <label>Stock</label>
+                        <input id="txtstock" type="number" class="form-control" />
+
+                        <label class="mt-2">Activo</label>
+                        <select id="cboactivo" class="form-select">
+                            <option value="1">Sí</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+
+                </form>
+
+                <div id="mensajeError" class="alert alert-danger mt-3" style="display:none;"></div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button id="btnGuardarProducto" class="btn btn-primary" onclick="Guardar()">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+		let tabladata = null;
+		let filaSeleccionada = null;
+		let _guardandoProducto = false;
+
+		// =======================
+		// IMAGEN
+		// =======================
+		function mostrarImagen(input) {
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = e => $("#img_producto").attr("src", e.target.result);
+				reader.readAsDataURL(input.files[0]);
+			}
+		}
+
+		// =======================
+		// CARGAR SELECTS
+		// =======================
+		function cargarSelect(url, selector, valueField, textField) {
+			const $select = $(selector);
+			$select.empty();
+
+			$select.append($("<option>", {
+				value: 0,
+				text: "Seleccionar",
+				disabled: true,
+				selected: true
+			}));
+
+			$.getJSON(url, function (response) {
+				if (response && response.data) {
+					$.each(response.data, function (_, item) {
+						$select.append($("<option>", {
+							value: item[valueField],
+							text: item[textField]
+						}));
+					});
+				}
+			});
+		}
+
+		// =======================
+		// TABLA (CONTROLADA)
+		// =======================
+		function inicializarTabla() {
+
+			console.log("Inicializando DataTable...");
+
+			if ($.fn.DataTable.isDataTable('#tabla')) {
+				$('#tabla').DataTable().clear().destroy();
+				$('#tabla tbody').empty(); //evita duplicados visuales
+			}
+
+			tabladata = $("#tabla").DataTable({
+				responsive: true,
+				destroy: true,
+				retrieve: true,
+				ajax: {
+					url: '@Url.Action("ListarProducto","Mantenedor")',
+					dataSrc: "data"
+				},
+				columns: [
+					{ data: "Nombre" },
+					{ data: "Descripcion" },
+					{
+						data: "oMarca",
+						render: data => data?.Descripcion || ""
+					},
+					{
+						data: "oCategoria",
+						render: data => data?.Descripcion || ""
+					},
+					{ data: "Precio" },
+					{ data: "Stock" },
+					{
+						data: "Activo",
+						render: v => v
+							? '<span class="badge bg-success">Sí</span>'
+							: '<span class="badge bg-danger">No</span>'
+					},
+					{
+						defaultContent:
+							'<button class="btn btn-primary btn-sm btn-editar">✏️</button>' +
+							'<button class="btn btn-danger btn-sm ms-2 btn-eliminar">🗑️</button>'
+					}
+				],
+				language: {
+					url: "https://cdn.datatables.net/plug-ins/2.3.7/i18n/es-ES.json"
+				}
+			});
+
+			// =======================
+			// EVENTOS (UNA SOLA VEZ)
+			// =======================
+			$('#tabla tbody').off("click", ".btn-editar").on("click", ".btn-editar", function () {
+				filaSeleccionada = $(this).closest("tr");
+				const data = tabladata.row(filaSeleccionada).data();
+				abrirModal(data);
+			});
+
+			$('#tabla tbody').off("click", ".btn-eliminar").on("click", ".btn-eliminar", function () {
+
+				const fila = $(this).closest("tr");
+				const data = tabladata.row(fila).data();
+
+				if (confirm("¿Eliminar producto?")) {
+					$.ajax({
+						url: '@Url.Action("EliminarProducto","Mantenedor")',
+						type: "POST",
+						contentType: "application/json",
+						data: JSON.stringify({ id: data.IdProducto }),
+						success: function (resp) {
+							if (resp.resultado) {
+								tabladata.row(fila).remove().draw();
+							}
+						}
+					});
+				}
+			});
+
+			// DEBUG
+			tabladata.on('xhr.dt', function (e, settings, json) {
+				console.log('Filas cargadas:', json?.data?.length);
+			});
+		}
+
+		// =======================
+		// INIT (CONTROL GLOBAL)
+		// =======================
+		$(document).ready(function () {
+
+			//BLOQUEO GLOBAL REAL
+			if (window._init_producto) return;
+			window._init_producto = true;
+
+			cargarSelect('@Url.Action("ListarMarca","Mantenedor")', '#cbomarca', 'IdMarca', 'Descripcion');
+			cargarSelect('@Url.Action("ListarCategoria","Mantenedor")', '#cbocategoria', 'IdCategoria', 'Descripcion');
+
+			inicializarTabla();
+		});
+
+		// =======================
+		// MODAL
+		// =======================
+		function abrirModal(data) {
+
+			$("#contenedor")[0].reset();
+			$("#txtid").val(0);
+			$("#img_producto").attr("src", "");
+			$("#mensajeError").hide();
+
+			if (data) {
+				$("#txtid").val(data.IdProducto);
+				$("#txtnombre").val(data.Nombre);
+				$("#txtdescripcion").val(data.Descripcion);
+				$("#cbomarca").val(data.oMarca.IdMarca);
+				$("#cbocategoria").val(data.oCategoria.IdCategoria);
+				$("#txtprecio").val(data.Precio);
+				$("#txtstock").val(data.Stock);
+				$("#cboactivo").val(data.Activo ? 1 : 0);
+			}
+
+			new bootstrap.Modal("#FormModal").show();
+		}
+
+		// =======================
+		// GUARDAR
+		// =======================
+		function Guardar() {
+
+			if (_guardandoProducto) return;
+
+			const producto = {
+				IdProducto: parseInt($("#txtid").val()) || 0,
+				Nombre: $("#txtnombre").val().trim(),
+				Descripcion: $("#txtdescripcion").val().trim(),
+				oMarca: { IdMarca: parseInt($("#cbomarca").val()) || 0 },
+				oCategoria: { IdCategoria: parseInt($("#cbocategoria").val()) || 0 },
+				Precio: parseFloat($("#txtprecio").val()) || 0,
+				PrecioTexto: $("#txtprecio").val().trim(),
+				Stock: parseInt($("#txtstock").val()) || 0,
+				Activo: $("#cboactivo").val() == "1"
+			};
+
+			if (!producto.Nombre || !producto.Descripcion) {
+				$("#mensajeError").text("Campos obligatorios").show();
+				return;
+			}
+
+			const formData = new FormData();
+			formData.append("objeto", JSON.stringify(producto));
+
+			const file = $("#fileProducto")[0].files[0];
+			if (file) formData.append("archivoImagen", file);
+
+			_guardandoProducto = true;
+			$('#btnGuardarProducto').prop('disabled', true);
+
+			$.ajax({
+				url: '@Url.Action("GuardarProducto","Mantenedor")',
+				type: "POST",
+				data: formData,
+				processData: false,
+				contentType: false
+			})
+			.done(function (resp) {
+
+				if (producto.IdProducto === 0) {
+
+                    if (resp && resp.idGenerado > 0) {
+						tabladata.ajax.reload(null, false);
+						$("#FormModal").modal("hide");
+					} else {
+						$("#mensajeError").text(resp?.mensaje || "Error al crear").show();
+					}
+
+				} else {
+
+					if (resp && resp.operacionExitosa) {
+						tabladata.row(filaSeleccionada).data(producto).draw(false);
+						$("#FormModal").modal("hide");
+					} else {
+						$("#mensajeError").text(resp?.mensaje || "Error al actualizar").show();
+					}
+				}
+
+			})
+			.fail(() => $("#mensajeError").text("Error al guardar").show())
+			.always(function () {
+				_guardandoProducto = false;
+				$('#btnGuardarProducto').prop('disabled', false);
+			});
+		}
+
+    </script>
+}

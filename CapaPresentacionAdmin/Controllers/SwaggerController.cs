@@ -22,69 +22,113 @@ namespace CapaPresentacionAdmin.Controllers
               ""basePath"": ""/"",
               ""schemes"": [""http"", ""https""],
               ""paths"": {
+
                 ""/Home/ListarUsuarios"": {
                   ""get"": {
-                    ""tags"": [""Home""],
-                    ""summary"": ""Listar usuarios"",
+                    ""tags"": [""Usuarios""],
+                    ""summary"": ""Listar todos los usuarios"",
                     ""produces"": [""application/json""],
                     ""responses"": {
                       ""200"": {
-                        ""description"": ""OK"",
+                        ""description"": ""Lista de usuarios"",
                         ""schema"": {
-                          ""type"": ""object"",
-                          ""properties"": {
-                            ""data"": {
-                              ""type"": ""array"",
-                              ""items"": { ""$ref"": ""#/definitions/Usuario"" }
-                            }
-                          }
+                          ""type"": ""array"",
+                          ""items"": { ""$ref"": ""#/definitions/Usuario"" }
                         }
                       }
                     }
                   }
                 },
+
+                ""/Home/BuscarUsuario/{id}"": {
+                  ""get"": {
+                    ""tags"": [""Usuarios""],
+                    ""summary"": ""Obtener usuario por ID"",
+                    ""parameters"": [
+                      {
+                        ""name"": ""id"",
+                        ""in"": ""path"",
+                        ""required"": true,
+                        ""type"": ""integer""
+                      }
+                    ],
+                    ""responses"": {
+                      ""200"": {
+                        ""description"": ""Usuario encontrado"",
+                        ""schema"": { ""$ref"": ""#/definitions/Usuario"" }
+                      },
+                      ""404"": { ""description"": ""No encontrado"" }
+                    }
+                  }
+                },
+
                 ""/Home/GuardarUsuario"": {
                   ""post"": {
-                    ""tags"": [""Home""],
-                    ""summary"": ""Guardar usuario"",
+                    ""tags"": [""Usuarios""],
+                    ""summary"": ""Crear usuario"",
                     ""consumes"": [""application/json""],
                     ""parameters"": [
                       {
                         ""in"": ""body"",
-                        ""name"": ""objeto"",
+                        ""name"": ""usuario"",
                         ""required"": true,
                         ""schema"": { ""$ref"": ""#/definitions/Usuario"" }
                       }
                     ],
                     ""responses"": {
-                      ""200"": { ""description"": ""OK"" }
+                      ""201"": { ""description"": ""Usuario creado"" },
+                      ""400"": { ""description"": ""Datos inválidos"" }
                     }
                   }
                 },
-                ""/Home/EliminarUsuario"": {
-                  ""post"": {
-                    ""tags"": [""Home""],
-                    ""summary"": ""Eliminar usuario"",
+
+                ""/Home/ActualizarUsuario/{id}"": {
+                  ""put"": {
+                    ""tags"": [""Usuarios""],
+                    ""summary"": ""Actualizar usuario"",
                     ""consumes"": [""application/json""],
                     ""parameters"": [
                       {
-                        ""in"": ""body"",
                         ""name"": ""id"",
+                        ""in"": ""path"",
                         ""required"": true,
-                        ""schema"": {
-                          ""type"": ""object"",
-                          ""properties"": {
-                            ""id"": { ""type"": ""integer"" }
-                          }
-                        }
+                        ""type"": ""integer""
+                      },
+                      {
+                        ""in"": ""body"",
+                        ""name"": ""usuario"",
+                        ""required"": true,
+                        ""schema"": { ""$ref"": ""#/definitions/Usuario"" }
                       }
                     ],
                     ""responses"": {
-                      ""200"": { ""description"": ""OK"" }
+                      ""200"": { ""description"": ""Usuario actualizado"" },
+                      ""404"": { ""description"": ""No encontrado"" }
+                    }
+                  }
+                },
+
+                ""/Home/EliminarUsuario/{id}"": {
+                  ""delete"": {
+                    ""tags"": [""Usuarios""],
+                    ""summary"": ""Eliminar usuario"",
+                    ""parameters"": [
+                      {
+                        ""name"": ""id"",
+                        ""in"": ""path"",
+                        ""required"": true,
+                        ""type"": ""integer""
+                      }
+                    ],
+                    ""responses"": {
+                      ""200"": { ""description"": ""Usuario eliminado"" },
+                      ""404"": { ""description"": ""No encontrado"" }
                     }
                   }
                 }
+
               },
+
               ""definitions"": {
                 ""Usuario"": {
                   ""type"": ""object"",

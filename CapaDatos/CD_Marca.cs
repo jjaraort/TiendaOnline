@@ -9,17 +9,17 @@ using System.Threading.Tasks;
 
 namespace CapaDatos
 {
-    public class CD_Categoria
+    public class CD_Marca
     {
-        public List<Categoria> Listar()
+        public List<Marca> Listar()
         {
-            List<Categoria> lista = new List<Categoria>();
+            List<Marca> lista = new List<Marca>();
 
             try
             {
                 using (SqlConnection conexion = new SqlConnection(Conexion.cn))
                 {
-                    string query = @"SELECT IdCategoria,Descripcion,Activo,FechaRegistro FROM CATEGORIA";
+                    string query = @"SELECT IdMarca,Descripcion,Activo FROM MARCA";
 
                     using (SqlCommand cmd = new SqlCommand(query, conexion))
                     {
@@ -30,9 +30,9 @@ namespace CapaDatos
                         {
                             while (dr.Read())
                             {
-                                lista.Add(new Categoria()
+                                lista.Add(new Marca()
                                 {
-                                    IdCategoria = dr["IdCategoria"] != DBNull.Value ? Convert.ToInt32(dr["IdCategoria"]) : 0,
+                                    IdMarca = dr["IdMarca"] != DBNull.Value ? Convert.ToInt32(dr["IdMarca"]) : 0,
                                     Descripcion = dr["Descripcion"]?.ToString(),
                                     Activo = dr["Activo"] != DBNull.Value && Convert.ToBoolean(dr["Activo"])
                                 });
@@ -44,20 +44,20 @@ namespace CapaDatos
             catch (Exception ex)
             {
                 // Ideal: loggear en archivo o sistema (no solo consola)
-                throw new Exception("Error al listar categorías", ex);
+                throw new Exception("Error al listar marca", ex);
             }
 
             return lista;
         }
-        public int Registrar(Categoria obj, out string Mensaje)
+        public int Registrar(Marca obj, out string Mensaje)
         {
-            int idCategoria = 0;
+            int IdMarca = 0;
             Mensaje = string.Empty;
 
             try
             {
                 using (SqlConnection conexion = new SqlConnection(Conexion.cn))
-                using (SqlCommand cmd = new SqlCommand("INSERT INTO CATEGORIA(Descripcion, Activo, FechaRegistro) VALUES(@Descripcion, @Activo, GETDATE()); SELECT CAST(SCOPE_IDENTITY() AS INT);", conexion))
+                using (SqlCommand cmd = new SqlCommand("INSERT INTO MARCA(Descripcion, Activo, FechaRegistro) VALUES(@Descripcion, @Activo, GETDATE()); SELECT CAST(SCOPE_IDENTITY() AS INT);", conexion))
                 {
                     cmd.Parameters.AddWithValue("@Descripcion", obj.Descripcion ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Activo", obj.Activo);
@@ -66,20 +66,20 @@ namespace CapaDatos
                     conexion.Open();
                     object result = cmd.ExecuteScalar();
                     if (result != null && result != DBNull.Value)
-                        idCategoria = Convert.ToInt32(result);
+                        IdMarca = Convert.ToInt32(result);
 
-                    Mensaje = "Categoria registrada correctamente";
+                    Mensaje = "Marca registrada correctamente";
                 }
             }
             catch (Exception ex)
             {
                 Mensaje = ex.Message;
-                idCategoria = 0;
+                IdMarca = 0;
             }
 
-            return idCategoria;
+            return IdMarca;
         }
-        public bool Editar(Categoria obj, out string Mensaje)
+        public bool Editar(Marca obj, out string Mensaje)
         {
             bool resultado = false;
             Mensaje = string.Empty;
@@ -87,9 +87,9 @@ namespace CapaDatos
             try
             {
                 using (SqlConnection conexion = new SqlConnection(Conexion.cn))
-                using (SqlCommand cmd = new SqlCommand("UPDATE CATEGORIA SET Descripcion = @Descripcion, Activo = @Activo WHERE IdCategoria = @IdCategoria", conexion))
+                using (SqlCommand cmd = new SqlCommand("UPDATE MARCA SET Descripcion = @Descripcion, Activo = @Activo WHERE IdMarca = @IdMarca", conexion))
                 {
-                    cmd.Parameters.AddWithValue("@IdCategoria", obj.IdCategoria);
+                    cmd.Parameters.AddWithValue("@IdMarca", obj.IdMarca);
                     cmd.Parameters.AddWithValue("@Descripcion", obj.Descripcion ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Activo", obj.Activo);
                     cmd.CommandType = CommandType.Text;
@@ -98,7 +98,7 @@ namespace CapaDatos
                     int filas = cmd.ExecuteNonQuery();
                     resultado = filas > 0;
 
-                    Mensaje = resultado ? "Categoria actualizada correctamente" : "No se encontró la categoría";
+                    Mensaje = resultado ? "Marca actualizada correctamente" : "No se encontró la Marca";
                 }
             }
             catch (Exception ex)
@@ -118,10 +118,10 @@ namespace CapaDatos
             {
                 using (SqlConnection conexion = new SqlConnection(Conexion.cn))
                 {
-                    string query = "DELETE FROM CATEGORIA WHERE IdCategoria = @IdCategoria";
+                    string query = "DELETE FROM MARCA WHERE IdMarca = @IdMarca";
 
                     SqlCommand cmd = new SqlCommand(query, conexion);
-                    cmd.Parameters.AddWithValue("@IdCategoria", id);
+                    cmd.Parameters.AddWithValue("@IdMarca", id);
                     cmd.CommandType = CommandType.Text;
 
                     conexion.Open();
@@ -139,5 +139,6 @@ namespace CapaDatos
 
             return respuesta;
         }
+
     }
 }
