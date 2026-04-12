@@ -42,7 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CN_Marca.cs" />
+<<<<<<< HEAD
     <Compile Include="CN_Producto.cs" />
+=======
+>>>>>>> f70d8af6a7ef25e4f18a56b8884698b80fcf50b2
     <Compile Include="CN_Recursos.cs" />
     <Compile Include="CN_Usuarios.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

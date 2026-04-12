@@ -44,7 +44,10 @@
   <ItemGroup>
     <Compile Include="CD_Categoria.cs" />
     <Compile Include="CD_Marca.cs" />
+<<<<<<< HEAD
     <Compile Include="CD_Producto.cs" />
+=======
+>>>>>>> f70d8af6a7ef25e4f18a56b8884698b80fcf50b2
     <Compile Include="CD_Usuarios.cs" />
     <Compile Include="Conexion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

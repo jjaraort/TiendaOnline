@@ -111,9 +111,13 @@ namespace CapaPresentacionAdmin.Controllers
 
             return Json(new { resultado = respuesta, mensaje = mensaje });
         }
+<<<<<<< HEAD
         #endregion
 
         #region Marca
+=======
+        #region Categoria
+>>>>>>> f70d8af6a7ef25e4f18a56b8884698b80fcf50b2
         [HttpGet]
         public JsonResult ListarMarca()
         {
@@ -192,6 +196,7 @@ namespace CapaPresentacionAdmin.Controllers
             return Json(new { resultado = respuesta, mensaje = mensaje });
         }
         #endregion
+<<<<<<< HEAD
 
         #region Producto
         [HttpGet]
@@ -313,5 +318,7 @@ namespace CapaPresentacionAdmin.Controllers
 
         #endregion
 
+=======
+>>>>>>> f70d8af6a7ef25e4f18a56b8884698b80fcf50b2
     }
 }
