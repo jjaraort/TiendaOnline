@@ -26,10 +26,8 @@ namespace CapaDatos
                     sb.AppendLine("FROM PRODUCTO p");
                     sb.AppendLine("INNER JOIN MARCA m ON m.IdMarca = p.IdMarca");
                     sb.AppendLine("INNER JOIN CATEGORIA c ON c.IdCategoria = p.IdCategoria");
-                    sb.AppendLine("GROUP BY p.IdProducto, p.Nombre, p.Descripcion,");
-                    sb.AppendLine("p.Precio, p.Stock, p.RutaImagen, p.NombreImagen, p.Activo,");
-                    sb.AppendLine("m.IdMarca, m.Descripcion,");
-                    sb.AppendLine("c.IdCategoria, c.Descripcion");
+                    // No GROUP BY necesario; ordenar por IdProducto para devolver siempre en el mismo orden
+                    sb.AppendLine("ORDER BY p.IdProducto ASC");
 
                     using (SqlCommand cmd = new SqlCommand(sb.ToString(), conexion))
                     {
@@ -71,7 +69,8 @@ namespace CapaDatos
                                 }
                             }
 
-                            lista = productos.Values.ToList();
+                            // Asegurar orden consistente por IdProducto (ascendente)
+                            lista = productos.Values.OrderBy(p => p.IdProducto).ToList();
                         }
                     }
                 }

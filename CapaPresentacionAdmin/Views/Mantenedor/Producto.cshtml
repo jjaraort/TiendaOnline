@@ -105,9 +105,7 @@
 		let filaSeleccionada = null;
 		let _guardandoProducto = false;
 
-		// =======================
 		// IMAGEN
-		// =======================
 		function mostrarImagen(input) {
 			if (input.files && input.files[0]) {
 				const reader = new FileReader();
@@ -116,9 +114,7 @@
 			}
 		}
 
-		// =======================
 		// CARGAR SELECTS
-		// =======================
 		function cargarSelect(url, selector, valueField, textField) {
 			const $select = $(selector);
 			$select.empty();
@@ -142,26 +138,37 @@
 			});
 		}
 
-		// =======================
 		// TABLA (CONTROLADA)
-		// =======================
 		function inicializarTabla() {
 
-			console.log("Inicializando DataTable...");
+            if ($.fn.DataTable.isDataTable('#tabla')) {
+                console.log("DataTable ya inicializada -> recargando datos");
+                tabladata = $('#tabla').DataTable();
+                tabladata.ajax.reload(null, false);
+                return;
+            }
 
-			if ($.fn.DataTable.isDataTable('#tabla')) {
-				$('#tabla').DataTable().clear().destroy();
-				$('#tabla tbody').empty(); //evita duplicados visuales
-			}
+            console.log("Inicializando DataTable...");
 
-			tabladata = $("#tabla").DataTable({
-				responsive: true,
-				destroy: true,
-				retrieve: true,
-				ajax: {
-					url: '@Url.Action("ListarProducto","Mantenedor")',
-					dataSrc: "data"
-				},
+            tabladata = $("#tabla").DataTable({
+                responsive: true,
+                // Procesar en el cliente para eliminar duplicados por IdProducto
+                ajax: {
+                    url: '@Url.Action("ListarProducto","Mantenedor")',
+                    dataSrc: function (json) {
+                        const items = (json && json.data) ? json.data : [];
+                        // Eliminar duplicados por IdProducto (manteniendo la primera aparición)
+                        const mapa = new Map();
+                        for (const it of items) {
+                            if (!mapa.has(it.IdProducto)) mapa.set(it.IdProducto, it);
+                        }
+                        const unique = Array.from(mapa.values());
+                        // Ordenar por IdProducto asc
+                        unique.sort((a, b) => (a.IdProducto || 0) - (b.IdProducto || 0));
+                        console.log('AJAX: recibidos', items.length, '-> únicos', unique.length);
+                        return unique;
+                    }
+                },
 				columns: [
 					{ data: "Nombre" },
 					{ data: "Descripcion" },

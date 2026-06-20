@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace CapaPresentacionAdmin
 {
@@ -17,6 +16,7 @@ namespace CapaPresentacionAdmin
                         "~/Scripts/DataTables/dataTables.responsive.js",
                         "~/Scripts/loadingoverlay/loadingoverlay.min.js",
                         "~/Scripts/sweetalert.min.js",
+                        "~/Scripts/jquery-ui-{version}.js",
                         "~/Scripts/scripts.js"));
 
             //bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
@@ -35,6 +35,7 @@ namespace CapaPresentacionAdmin
                 "~/Content/site.css",
                 "~/Content/DataTables/css/jquery.dataTables.css",
                 "~/Content/sweetalert.css",
+                "~/Content/themes/base/jquery-ui.css",
                 "~/Content/DataTables/css/responsive.dataTables.css"
                 ));
         }

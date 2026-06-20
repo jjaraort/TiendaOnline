@@ -1,10 +1,6 @@
 ﻿using CapaEntidad;
 using CapaNegocio;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace CapaPresentacionAdmin.Controllers
@@ -40,20 +36,36 @@ namespace CapaPresentacionAdmin.Controllers
             {
                 resultado = new CN_Usuarios().Registrar(objeto, out mensaje);
             }
-            else {
+            else
+            {
                 resultado = new CN_Usuarios().Editar(objeto, out mensaje);
             }
             return Json(new { resultado = resultado, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public JsonResult EliminarUsuario(int id) {
+        public JsonResult EliminarUsuario(int id)
+        {
             bool respuesta = false;
             string mensaje = string.Empty;
 
             respuesta = new CN_Usuarios().Eliminar(id, out mensaje);
 
             return Json(new { resultado = respuesta, mensaje = mensaje }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult ListaReporte(string fechainicio, string fechafin, string idtransaccion)
+        {
+            List<Reporte> lista = new CN_Reporte().Ventas(fechainicio, fechafin, idtransaccion);
+            return Json(new { data = lista }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult ObtenerDashBoard()
+        {
+            DashBoard dashBoard = new CN_Reporte().ObtenerDashBoard();
+            return Json(dashBoard, JsonRequestBehavior.AllowGet);
         }
     }
 }
